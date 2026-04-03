@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writer.plore | Explore Writing</title>
+	<link rel="icon" href="logo.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a192f 0%, #1e3a8a 100%);
+            color: #e2e8f0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid #334155;
+            padding: 24px;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            color: #60a5fa;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .story-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3b82f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 16px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+        }
+
+        .chapters {
+            margin-bottom: 24px;
+        }
+
+        .chapter-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chapter-item:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .chapter-item.active {
+            background: rgba(59, 130, 246, 0.3);
+            border: 1px solid #60a5fa;
+        }
+
+        .chapter-title {
+            flex: 1;
+            font-weight: 500;
+            font-size: 14px;
+			cursor: pointer;
+        }
+
+        .chapter-wordcount {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(51, 65, 85, 0.8);
+            border: 1px solid #475569;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(71, 85, 105, 0.8);
+        }
+
+        /* Main Editor */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .editor-header {
+            padding: 24px;
+            border-bottom: 1px solid #334155;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+        }
+
+        .word-count {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid #3b82f6;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .editor-container {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .editor {
+            width: 100%;
+            max-width: 900px;
+            height: auto;
+			min-height: calc(1000vh - 150px);
+            padding: 80px 80px;
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 14px;
+            line-height: 1.7;
+            font-family: 'Inter', serif;
+            border: none;
+            outline: none;
+			overflow: hidden !important;
+			resize: none !important;
+			scrollbar-width: none;
+			-ms-overflow-style: none;
+        }
+		
+		.editor::-webkit-scrollbar {
+			display: none;
+		}
+
+        .editor::placeholder {
+            color: #64748b;
+        }
+
+        .autosave {
+            position: absolute;
+            bottom: 20px;
+            right: 24px;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .autosave.show {
+            opacity: 1;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(148, 163, 184, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                height: 100vh;
+                z-index: 1000;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .editor-container {
+                padding: 20px;
+            }
+
+            .editor {
+                padding: 20px;
+                font-size: 16px;
+            }
+        }
+
+        .characters-section {
+            margin-top: 24px;
+        }
+
+        .character-item {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .character-name {
+            font-weight: 500;
+            color: #60a5fa;
+        }
+
+        .character-traits {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+</style>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">Writer.plore</div>
+            
+            <!-- Story Info -->
+            <div class="story-info">
+                <div class="input-group">
+                    <label>Judul Cerita</label>
+                    <input type="text" id="storyTitle" placeholder="Masukkan judul cerita...">
+                </div>
+                <button class="btn" onclick="saveStory()">Simpan Cerita</button>
+            </div>
+
+            <!-- Chapters -->
+            <div class="chapters">
+                <div class="chapters-header">
+                    <h3 style="margin-bottom: 16px;">Chapter</h3>
+                    <button class="btn btn-secondary btn-small" onclick="addChapter()">+ Chapter baru</button>
+                </div>
+                <div id="chaptersList"></div>
+            </div>
+
+            <!-- Characters -->
+            <div class="characters-section">
+                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Karakter</h3>
+                <div id="charactersList">
+                    <div class="character-item" onclick="editCharacter()">
+                        <div class="character-name">Nama Karakter</div>
+                        <div class="character-traits">Pemberani, setia, pemikir</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="addCharacter()">+ Karakter Baru</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <div class="editor-header">
+                <div class="word-count" id="wordCount">0 kata</div>
+            </div>
+            <div class="editor-container">
+                <textarea class="editor" id="editor" placeholder="Tulis cerita di sini..."></textarea>
+            </div>
+            <div class="autosave" id="autosave">Autosaved</div>
+        </div>
+    </div>
+
+    <script>
+        let currentStory = JSON.parse(localStorage.getItem('currentStory')) || {
+            title: '',
+            chapters: [{ id: 1, title: 'Chapter 1', content: '', wordCount: 0 }],
+            characters: []
+        };
+        let currentChapterIndex = 0;
+        let autoSaveTimeout;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStory();
+            updateChaptersList();
+            updateCharactersList();
+            updateWordCount();
+            
+            // Auto-save every 3 seconds
+            document.getElementById('editor').addEventListener('input', function() {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(autoSave, 3000);
+                updateWordCount();
+                saveCurrentChapter();
+            });
+
+            // Load chapter on change
+            document.getElementById('storyTitle').addEventListener('input', function() {
+                currentStory.title = this.value;
+                localStorage.setItem('currentStory', JSON.stringify(currentStory));
+            });
+        });
+
+        function loadStory() {
+            document.getElementById('storyTitle').value = currentStory.title;
+            document.getElementById('editor').value = currentStory.chapters[currentChapterIndex]?.content || '';
+        }
+
+        function saveCurrentChapter() {
+            if (currentStory.chapters[currentChapterIndex]) {
+                currentStory.chapters[currentChapterIndex].content = document.getElementById('editor').value;
+                currentStory.chapters[currentChapterIndex].wordCount = getWordCount();
+                updateChaptersList();
+                localStorage.setItem('currentStory', JSON.stringify(currentStory));
+            }
+        }
+
+        function autoSave() {
+            saveCurrentChapter();
+            showAutoSave();
+        }
+
+        function showAutoSave() {
+            const autosave = document.getElementById('autosave');
+            autosave.classList.add('show');
+            setTimeout(() => {
+                autosave.classList.remove('show');
+            }, 2000);
+        }
+
+        function updateWordCount() {
+            const count = getWordCount();
+            document.getElementById('wordCount').textContent = `${count} kata`;
+        }
+
+        function getWordCount() {
+            const text = document.getElementById('editor').value;
+            return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+        }
+
+        function addChapter() {
+            const newChapter = {
+                id: currentStory.chapters.length + 1,
+                title: `Chapter ${currentStory.chapters.length + 1}`,
+                content: '',
+                wordCount: 0
+            };
+            currentStory.chapters.push(newChapter);
+            currentChapterIndex = currentStory.chapters.length - 1;
+            updateChaptersList();
+            loadCurrentChapter();
+            localStorage.setItem('currentStory', JSON.stringify(currentStory));
+        }
+
+        function updateChaptersList() {
+            const container = document.getElementById('chaptersList');
+            container.innerHTML = '';
+            currentStory.chapters.forEach((chapter, index) => {
+                const div = document.createElement('div');
+                div.className = `chapter-item ${index === currentChapterIndex ? 'active' : ''}`;
+                div.onclick = () => switchChapter(index);
+                div.innerHTML = `
+                    <div class="chapter-title">${chapter.title}</div>
+                    <div class="chapter-wordcount">${chapter.wordCount} kata</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function switchChapter(index) {
+            saveCurrentChapter();
+            currentChapterIndex = index;
+            loadCurrentChapter();
+            updateChaptersList();
+        }
+
+        function loadCurrentChapter() {
+            document.getElementById('editor').value = currentStory.chapters[currentChapterIndex]?.content || '';
+            updateWordCount();
+        }
+
+		// Double-click untuk edit nama chapter
+		function updateChaptersList() {
+			const container = document.getElementById('chaptersList');
+			container.innerHTML = '';
+			currentStory.chapters.forEach((chapter, index) => {
+			const div = document.createElement('div');
+			div.className = `chapter-item ${index === currentChapterIndex ? 'active' : ''}`;
+			div.innerHTML = `
+				<span class="chapter-title" ondblclick="editChapterTitle(${index})">${chapter.title}</span>
+				<div class="chapter-wordcount">${chapter.wordCount} kata</div>
+        `	;
+			div.onclick = (e) => {
+				if (e.target.tagName !== 'INPUT') switchChapter(index);
+			};
+			container.appendChild(div);
+			});
+		}
+
+		// Fungsi edit nama chapter
+		function editChapterTitle(index) {
+			const chapter = currentStory.chapters[index];
+			const newTitle = prompt('Judul chapter', chapter.title);
+				if (newTitle !== null && newTitle.trim()) {
+					chapter.title = newTitle.trim();
+					localStorage.setItem('currentStory', JSON.stringify(currentStory));
+					updateChaptersList();
+			}
+		}
+
+        function saveStory() {
+            localStorage.setItem('currentStory', JSON.stringify(currentStory));
+            alert('Cerita berhasil disimpan!');
+        }
+
+        function addCharacter() {
+            const name = prompt('Nama karakter:');
+            if (name) {
+                const traits = prompt('Sifat karakter') || '';
+                currentStory.characters.push({
+                    name,
+                    traits: traits.split(',').map(t => t.trim()).filter(t => t)
+                });
+                updateCharactersList();
+                localStorage.setItem('currentStory', JSON.stringify(currentStory));
+            }
+        }
+
+		// STATE
+			const [characters, setCharacters] = useState([]);
+
+
+        function updateCharactersList() {
+            const container = document.getElementById('charactersList');
+            container.innerHTML = '';
+            currentStory.characters.forEach(character => {
+                const div = document.createElement('div');
+                div.className = 'character-item';
+                div.onclick = () => editCharacter(character);
+                div.innerHTML = `
+                    <div class="character-name">${character.name}</div>
+                    <div class="character-traits">${character.traits.join(', ')}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function editCharacter(character = null) {
+            const name = character ? character.name : prompt('Nama karakter');
+            if (name) {
+                const traits = prompt('Sifat karakter', 
+                    character ? character.traits.join(', ') : '');
+                if (traits !== null) {
+                    const traitsArray = traits.split(',').map(t => t.trim()).filter(t => t);
+                    if (character) {
+                        character.name = name;
+                        character.traits = traitsArray;
+                    } else {
+                        currentStory.characters.push({ name, traits: traitsArray });
+                    }
+                    updateCharactersList();
+                    localStorage.setItem('currentStory', JSON.stringify(currentStory));
+                }
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+		
+		// Tab to indent paragraph
+	document.getElementById('editor').addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        
+        // Insert 4 spaces for indent
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        
+        this.value = this.value.substring(0, start) + 
+                    '    ' +  // 4 spaces = tab indent
+                    this.value.substring(end);
+        
+        // Set cursor after indent
+        this.selectionStart = this.selectionEnd = start + 4;
+    }
+	});
+    </script>
+</body>
+</html>
